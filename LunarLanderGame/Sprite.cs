@@ -17,8 +17,8 @@
         private Vector2 origin;
         private Vector2 scale;
 
-        public Sprite(Game game, Texture2D texture, Vector2 position)
-            : base(game)
+        public Sprite( Game game, Texture2D texture, Vector2 position )
+            : base( game )
         {
             this.texture = texture;
             this.position = position;
@@ -26,67 +26,66 @@
             rotation = 0f;
 
             // Default to the center
-            origin = new Vector2(texture.Width / 2, texture.Height / 2);
+            origin = new Vector2( texture.Width / 2, texture.Height / 2 );
 
             scale = Vector2.One;
         }
 
-        public override void Draw(GameTime gameTime)
+        public override void Draw( GameTime gameTime )
         {
             SpriteBatch spriteBatch = Game.Services.GetService<SpriteBatch>();
             spriteBatch.Begin();
-            spriteBatch.Draw(texture, position, null, color, rotation, origin, scale, SpriteEffects.None, 0f);
+            spriteBatch.Draw( texture, position, null, color, rotation, origin, scale, SpriteEffects.None, 0f );
             spriteBatch.End();
 
-            base.Draw(gameTime);
+            base.Draw( gameTime );
         }
 
         // Helper methods to manipulate the sprite's properties
-        public void SetPosition(Vector2 newPosition)
-        { 
+        public void SetPosition( Vector2 newPosition )
+        {
             position = newPosition;
-            Debug.WriteLine($"({position.X},{position.Y})");
         }
 
-    public Vector2 GetPosition()
+        public Vector2 GetPosition( )
         {
             return position;
         }
 
-        public void SetColor(Color newColor)
+        public void SetColor( Color newColor )
         {
             color = newColor;
         }
 
-        public Color GetColor()
+        public Color GetColor( )
         {
             return color;
         }
 
-        public void SetRotation(float newRotationDegrees)
+        public void SetRotation( float newRotationDegrees )
         {
             // Internally the rotation is stored in radians, but we expect users to
             // give us the rotation in units of degrees
             rotation = newRotationDegrees * DEGREES_TO_RADIANS;
         }
 
-        public float GetRotation()
+        public float GetRotation( )
         {
             // Convert back to degrees from radians
             return rotation * RADIANS_TO_DEGREES;
         }
 
-        public void SetOrigin(Vector2 newOrigin)
+        public void SetOrigin( Vector2 newOrigin )
         {
             origin = newOrigin;
         }
 
-        public Vector2 GetOrigin()
+        public Vector2 GetOrigin( )
         {
             return origin;
         }
 
-        public void SetScale(Vector2 newScale)
+        public void SetScale( Vector2 newScale )
         {
             scale = newScale;
         }
