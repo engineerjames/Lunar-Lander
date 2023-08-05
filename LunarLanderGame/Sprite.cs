@@ -3,10 +3,12 @@
     using Microsoft.Xna.Framework.Graphics;
     using Microsoft.Xna.Framework;
     using System;
+    using System.Diagnostics;
 
     public class Sprite : DrawableGameComponent
     {
-        private static float DEG_TO_RADIANS = (float)( Math.PI / 180.0 );
+        private static float DEGREES_TO_RADIANS = (float)( Math.PI / 180.0 );
+        private static float RADIANS_TO_DEGREES = (float)( 180.0 / Math.PI );
 
         private Texture2D texture;
         private Vector2 position;
@@ -41,11 +43,12 @@
 
         // Helper methods to manipulate the sprite's properties
         public void SetPosition(Vector2 newPosition)
-        {
+        { 
             position = newPosition;
+            Debug.WriteLine($"({position.X},{position.Y})");
         }
 
-        public Vector2 GetPosition()
+    public Vector2 GetPosition()
         {
             return position;
         }
@@ -64,12 +67,13 @@
         {
             // Internally the rotation is stored in radians, but we expect users to
             // give us the rotation in units of degrees
-            rotation = newRotationDegrees * DEG_TO_RADIANS;
+            rotation = newRotationDegrees * DEGREES_TO_RADIANS;
         }
 
         public float GetRotation()
         {
-            return rotation;
+            // Convert back to degrees from radians
+            return rotation * RADIANS_TO_DEGREES;
         }
 
         public void SetOrigin(Vector2 newOrigin)

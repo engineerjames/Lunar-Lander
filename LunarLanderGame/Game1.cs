@@ -5,6 +5,7 @@
     using Microsoft.Xna.Framework;
     using Microsoft.Xna.Framework.Graphics;
     using Microsoft.Xna.Framework.Input;
+    using System;
 
     public class Game1 : Game
     {
@@ -14,6 +15,12 @@
         private ILogger _logger;
 
         private Sprite _lander;
+
+        // Temporary physics until we get a Lander class
+        private Vector2 _landerVelocity;
+        private Vector2 _landerThrust;
+        private Vector2 _landerAcceleration;
+        private float _landerMassInKg = 100.0f;
 
         public Game1()
         {
@@ -25,6 +32,8 @@
 
             _textureManager = new TextureManager(Content, _logger);
 
+            this.IsFixedTimeStep = true;
+            this.TargetElapsedTime = TimeSpan.FromSeconds(1d / 60d); 
         }
 
         protected override void Initialize()
@@ -52,13 +61,73 @@
 
         protected override void Update(GameTime gameTime)
         {
+            // We only control the _lander here
+            ProcessPlayerInput(gameTime);
+
+            ApplyPhysics(gameTime);
+
+            base.Update(gameTime);
+        }
+
+        private void ApplyPhysics(GameTime gameTime)
+        {
+            // m/s^2 - y coordinate faces down
+            //
+            // From top left corner of screen
+            //  ----x+
+            // |
+            // |
+            // |
+            // y+
+
+            Vector2 gravity = new Vector2(0, 9.8f);
+
+            Vector2 accelerationFromThrust = _landerThrust / _landerMassInKg;
+
+            if (accelerationFromThrust.Length() < gravity.Length() && _landerThrust.Length() > 0)
+            {
+                _logger.Log(ILogger.LogLevel.Info, "Can't fight gravity!");
+            }
+
+            // Currently, just gravity--but we will need to figure out the thruster
+            _landerAcceleration = gravity + accelerationFromThrust;
+
+            // m/s^2 * s == m/s
+            _landerVelocity += _landerAcceleration * (float)(gameTime.ElapsedGameTime.TotalSeconds);
+
+            // m/s * s == m
+            _lander.SetPosition(_lander.GetPosition() + _landerVelocity * (float)( gameTime.ElapsedGameTime.TotalSeconds ));
+        }
+
+        private void ProcessPlayerInput(GameTime gameTime)
+        {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            // We only control the _lander here
+            if (Keyboard.GetState().IsKeyDown(Keys.W))
+            {
+                // TODO: Add thrust based on rotation
+                _landerThrust = new Vector2(0.0f, -1200.0f);
+            }
+            else
+            {
+                 _landerThrust = Vector2.Zero;
+            }
 
+            if (Keyboard.GetState().IsKeyDown(Keys.A))
+            {
+                // Rotate CCW                
+                float newRotation = (float)( _lander.GetRotation() - 100 * gameTime.ElapsedGameTime.TotalSeconds );
+                _lander.SetRotation(newRotation);
+            }
 
-            base.Update(gameTime);
+            if (Keyboard.GetState().IsKeyDown(Keys.D))
+            {
+                // Rotate CCW                
+                float newRotation = (float)( _lander.GetRotation() + 100 * gameTime.ElapsedGameTime.TotalSeconds );
+                _lander.SetRotation(newRotation);
+            }
+
         }
 
         protected override void Draw(GameTime gameTime)
