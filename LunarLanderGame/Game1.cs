@@ -22,7 +22,6 @@
         private Vector2 _landerThrust;
         private Vector2 _landerAcceleration;
         private float _landerMassInKg;
-        private BasicEffect _basicEffect;
 
         // Planet
         private PlanetGenerator _planetGenerator;
@@ -36,7 +35,7 @@
 
             _logger = new ConsoleLogger();
 
-            _textureManager = new TextureManager( Content, _logger );
+            _textureManager = new TextureManager( this, Content, _logger );
 
             this.IsFixedTimeStep = true;
             this.TargetElapsedTime = TimeSpan.FromSeconds( 1d / 60d );
@@ -50,38 +49,32 @@
             _landerMassInKg = 100.0f;
 
             _planetGenerator = new PlanetGenerator();
-            _planet = _planetGenerator.GetDefaultPlanet( _graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight );
-        }
+            _planet = _planetGenerator.GetDefaultPlanet( this, _graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight );
 
-        protected override void Initialize( )
-        {
-            base.Initialize();
-
-            _logger.Log( ILogger.LogLevel.Info, "Game initialized." );
-            _spriteBatch = new SpriteBatch( GraphicsDevice );
-            Services.AddService( _spriteBatch );
+            _lander = new Sprite( this, "lander", 
+                                  _textureManager, new Vector2( _graphics.PreferredBackBufferWidth / 2,
+                                                                _graphics.PreferredBackBufferHeight / 2 ) );
+            _lander.SetScale( new Vector2( 0.1f, 0.1f ) );
         }
 
         protected override void LoadContent( )
         {
-            _textureManager.LoadAllTextures();
-
-            _lander = new Sprite( this,
-                     _textureManager.GetTexture( "lander" ),
-                     new Vector2( _graphics.PreferredBackBufferWidth / 2, _graphics.PreferredBackBufferHeight / 2 ) );
-            _lander.SetScale( new Vector2( 0.1f, 0.1f ) );
-
-            Components.Add( _lander );
-
-            _basicEffect = new BasicEffect( GraphicsDevice )
-            {
-                VertexColorEnabled = true,
-                Projection = Matrix.CreateOrthographicOffCenter( 0, GraphicsDevice.Viewport.Width,
-                                                    GraphicsDevice.Viewport.Height, 0, 0, 1 )
-            };
-
-            _logger.Log( ILogger.LogLevel.Info, "Content loaded." );
         }
+
+        protected override void Initialize( )
+        {
+            _logger.Log( ILogger.LogLevel.Info, "Game initializing." );
+
+            // Add all game components
+            Components.Add( _textureManager );
+            Components.Add( _lander );
+            Components.Add( _planet );
+
+            _spriteBatch = new SpriteBatch( GraphicsDevice );
+            Services.AddService( _spriteBatch );
+
+            base.Initialize();
+        }        
 
         protected override void Update( GameTime gameTime )
         {
@@ -133,7 +126,7 @@
             if ( Keyboard.GetState().IsKeyDown( Keys.W ) )
             {
                 // TODO: Add thrust based on rotation
-                _landerThrust = new Vector2( 0.0f, -1200.0f );
+                _landerThrust = new Vector2( 0.0f, -2000.0f );
             }
             else
             {
@@ -159,19 +152,6 @@
         protected override void Draw( GameTime gameTime )
         {
             GraphicsDevice.Clear( Color.Black );
-
-            // Draw planet (TODO: Register as a component instead)
-            GraphicsDevice.RasterizerState = new RasterizerState() { FillMode = FillMode.WireFrame };
-
-            _basicEffect.View = Matrix.Identity;
-            _basicEffect.World = Matrix.Identity;
-            _basicEffect.Projection = Matrix.CreateOrthographicOffCenter( 0, GraphicsDevice.Viewport.Width,
-                                                                        GraphicsDevice.Viewport.Height, 0, 0, 1 );
-
-
-            _basicEffect.CurrentTechnique.Passes [ 0 ].Apply();
-            GraphicsDevice.DrawUserPrimitives( PrimitiveType.TriangleList, _planet.vertices.ToArray(), 0, 1 );
-
 
             base.Draw( gameTime );
         }

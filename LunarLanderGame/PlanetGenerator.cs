@@ -3,12 +3,6 @@
     using Microsoft.Xna.Framework;
     using Microsoft.Xna.Framework.Graphics;
 
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
-
     class PlanetGenerator
     {
         // 
@@ -16,13 +10,13 @@
         //
         // *                 *
         // *                 *
-        public Planet GetDefaultPlanet( int width, int height )
+        public Planet GetDefaultPlanet( Game game, int width, int height )
         {
-            var planet = new Planet();
+            var planet = new Planet(game);
 
-            Color vertexColor = Color.White;
+            Color vertexColor = Color.Gray;
 
-            int planetHeight = 50;
+            int planetHeight = 150;
 
             // Setup vertices
             // Left triangle first
@@ -31,9 +25,9 @@
             planet.vertices.Add( new VertexPositionColor( new Vector3( 0.0f, height, 0.0f ), vertexColor ) );
 
             // Right triangle
-            //planet.vertices.Add( new VertexPositionColor( new Vector3( width, height, 0.0f ), vertexColor ) );
-            //planet.vertices.Add( new VertexPositionColor( new Vector3( 0.0f, height - planetHeight, 0.0f ), vertexColor ) );
-            //planet.vertices.Add( new VertexPositionColor( new Vector3( width, height - planetHeight, 0.0f ), vertexColor ) );
+            planet.vertices.Add( new VertexPositionColor( new Vector3( 0.0f, height - planetHeight, 0.0f ), vertexColor ) );
+            planet.vertices.Add( new VertexPositionColor( new Vector3( width, height - planetHeight, 0.0f ), vertexColor ) );
+            planet.vertices.Add( new VertexPositionColor( new Vector3( width, height, 0.0f ), vertexColor ) );
 
             return planet;
         }

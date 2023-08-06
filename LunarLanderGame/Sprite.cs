@@ -16,29 +16,38 @@
         private float rotation;
         private Vector2 origin;
         private Vector2 scale;
+        private TextureManager textureManager;
+        private string textureName;
 
-        public Sprite( Game game, Texture2D texture, Vector2 position )
+        internal Sprite( Game game, string textureName, TextureManager textureManager, Vector2 position )
             : base( game )
         {
-            this.texture = texture;
             this.position = position;
             color = Color.White;
             rotation = 0f;
-
-            // Default to the center
-            origin = new Vector2( texture.Width / 2, texture.Height / 2 );
-
             scale = Vector2.One;
+
+            this.textureName = textureName;
+            this.textureManager = textureManager; 
         }
 
         public override void Draw( GameTime gameTime )
         {
             SpriteBatch spriteBatch = Game.Services.GetService<SpriteBatch>();
+
             spriteBatch.Begin();
             spriteBatch.Draw( texture, position, null, color, rotation, origin, scale, SpriteEffects.None, 0f );
             spriteBatch.End();
 
             base.Draw( gameTime );
+        }
+
+        protected override void LoadContent( )
+        {
+            texture = textureManager.GetTexture( textureName );
+            origin = new Vector2( texture.Width / 2, texture.Height / 2 );
+
+            base.LoadContent();
         }
 
         // Helper methods to manipulate the sprite's properties
