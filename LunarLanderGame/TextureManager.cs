@@ -46,7 +46,7 @@
         // Load all textures from the content file
         private void LoadAllTextures( )
         {
-            logger.Log( ILogger.LogLevel.Info, $"Loading all textures {assetName}..." );
+            logger.Log( ILogger.LogLevel.Info, $"Loading all textures..." );
 
             // Add all your texture asset names here -- TODO: Load from input file?
             string [] textureAssetNames = new string []
