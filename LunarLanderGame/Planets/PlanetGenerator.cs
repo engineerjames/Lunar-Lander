@@ -1,4 +1,4 @@
-﻿namespace LunarLanderGame
+﻿namespace LunarLanderGame.Planets
 {
     using Microsoft.Xna.Framework;
     using Microsoft.Xna.Framework.Graphics;
@@ -12,7 +12,7 @@
         // *                 *
         public Planet GetDefaultPlanet( Game game, int width, int height )
         {
-            var planet = new Planet(game);
+            var planet = new Planet( game );
 
             Color vertexColor = Color.Gray;
 
