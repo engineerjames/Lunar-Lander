@@ -1,4 +1,4 @@
-﻿namespace LunarLanderGame
+﻿namespace LunarLanderGame.Components
 {
     using Microsoft.Xna.Framework.Graphics;
     using Microsoft.Xna.Framework;
@@ -28,7 +28,7 @@
             scale = Vector2.One;
 
             this.textureName = textureName;
-            this.textureManager = textureManager; 
+            this.textureManager = textureManager;
         }
 
         public override void Draw( GameTime gameTime )

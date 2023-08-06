@@ -1,4 +1,4 @@
-﻿namespace LunarLanderGame
+﻿namespace LunarLanderGame.Components
 {
     using LunarLanderGame.Logging;
 
@@ -24,7 +24,7 @@
 
         protected override void LoadContent( )
         {
-            LoadAllTextures( );
+            LoadAllTextures();
 
             base.LoadContent();
         }

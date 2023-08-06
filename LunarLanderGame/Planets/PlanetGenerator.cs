@@ -1,5 +1,6 @@
 ﻿namespace LunarLanderGame.Planets
 {
+    using LunarLanderGame.Components;
     using Microsoft.Xna.Framework;
     using Microsoft.Xna.Framework.Graphics;
 
