@@ -22,6 +22,11 @@
         private Vector2 _landerThrust;
         private Vector2 _landerAcceleration;
         private float _landerMassInKg;
+        private BasicEffect _basicEffect;
+
+        // Planet
+        private PlanetGenerator _planetGenerator;
+        private Planet _planet;
 
         public Game1( )
         {
@@ -43,6 +48,9 @@
             _landerThrust = Vector2.Zero;
             _landerAcceleration = Vector2.Zero;
             _landerMassInKg = 100.0f;
+
+            _planetGenerator = new PlanetGenerator();
+            _planet = _planetGenerator.GetDefaultPlanet( _graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight );
         }
 
         protected override void Initialize( )
@@ -64,6 +72,13 @@
             _lander.SetScale( new Vector2( 0.1f, 0.1f ) );
 
             Components.Add( _lander );
+
+            _basicEffect = new BasicEffect( GraphicsDevice )
+            {
+                VertexColorEnabled = true,
+                Projection = Matrix.CreateOrthographicOffCenter( 0, GraphicsDevice.Viewport.Width,
+                                                    GraphicsDevice.Viewport.Height, 0, 0, 1 )
+            };
 
             _logger.Log( ILogger.LogLevel.Info, "Content loaded." );
         }
@@ -145,7 +160,18 @@
         {
             GraphicsDevice.Clear( Color.Black );
 
-            // TODO: Add your drawing code here
+            // Draw planet (TODO: Register as a component instead)
+            GraphicsDevice.RasterizerState = new RasterizerState() { FillMode = FillMode.WireFrame };
+
+            _basicEffect.View = Matrix.Identity;
+            _basicEffect.World = Matrix.Identity;
+            _basicEffect.Projection = Matrix.CreateOrthographicOffCenter( 0, GraphicsDevice.Viewport.Width,
+                                                                        GraphicsDevice.Viewport.Height, 0, 0, 1 );
+
+
+            _basicEffect.CurrentTechnique.Passes [ 0 ].Apply();
+            GraphicsDevice.DrawUserPrimitives( PrimitiveType.TriangleList, _planet.vertices.ToArray(), 0, 1 );
+
 
             base.Draw( gameTime );
         }
