@@ -8,7 +8,7 @@
 
     using System.Collections.Generic;
 
-    internal class TextureManager : DrawableGameComponent
+    public class TextureManager : DrawableGameComponent
     {
         private ContentManager contentManager;
         private Dictionary<string, Texture2D> textures;

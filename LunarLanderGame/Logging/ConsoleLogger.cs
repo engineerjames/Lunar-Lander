@@ -5,7 +5,7 @@
     using static LunarLanderGame.Logging.ILogger;
 
 
-    internal class ConsoleLogger : ILogger
+    public class ConsoleLogger : ILogger
     {
         public void Log(LogLevel level, string message)
         {

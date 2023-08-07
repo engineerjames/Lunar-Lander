@@ -4,7 +4,7 @@
     using Microsoft.Xna.Framework;
     using System.Collections.Generic;
 
-    class Planet : DrawableGameComponent
+    public class Planet : DrawableGameComponent
     {
         public List<VertexPositionColor> vertices;
         private BasicEffect _basicEffect;

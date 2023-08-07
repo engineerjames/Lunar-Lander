@@ -7,7 +7,7 @@
 
     using System;
 
-    internal class Lander : DrawableGameComponent
+    public class Lander : DrawableGameComponent
     {
         private Sprite _lander;
         // private Sprite _thruster;
@@ -17,8 +17,12 @@
         private Vector2 _landerThrust;
         private Vector2 _landerAcceleration;
         private float _landerMassInKg;
+        private float _thrustMagnitude;
 
         private ILogger _logger;
+
+        private static float DEGREES_TO_RADIANS = (float)( Math.PI / 180.0 );
+        private static float RADIANS_TO_DEGREES = (float)( 180.0 / Math.PI );
 
         public Lander( Game game, TextureManager textureManager, Vector2 initialPosition, ILogger logger ) : base( game )
         {
@@ -45,6 +49,39 @@
         protected override void LoadContent( )
         {
             base.LoadContent();
+        }
+
+        public void SetRotation( float angleInDegrees )
+        {
+            _lander.SetRotation( angleInDegrees );
+        }
+
+        public void SetThrustMagnitudeInNewtons(float thrustInNewtons )
+        {
+            _thrustMagnitude = thrustInNewtons;
+        }
+
+        public float GetThrustMagnitudeInNewtons()
+        {
+            return _thrustMagnitude;
+        }
+
+        public float GetRotation( )
+        {
+            return _lander.GetRotation();
+        }
+
+        public Vector2 CalculateVectorizedThrust( )
+        {
+            // The rotation we obtain here is of the LANDER - 0° means the thrust vector is pointing straight up.
+            // However, rotations in a vector sense are then 90° out of phase (0° points right across the X-axis).
+            float theta = (90 - GetRotation()) * DEGREES_TO_RADIANS;
+            float Vx = (float)( _thrustMagnitude * Math.Cos( theta ) );
+            float Vy = (float)( _thrustMagnitude * Math.Sin( theta ) );
+
+            // Since our coordinate system has Y facing down, we always invert the "Y" coordinate.
+
+            return new Vector2(Vx, -Vy);
         }
 
         public override void Draw( GameTime gameTime )
@@ -86,7 +123,7 @@
             base.Update( gameTime );
         }
 
-        private void ApplyPhysics(GameTime gameTime)
+        private void ApplyPhysics( GameTime gameTime )
         {
             Vector2 gravity = new Vector2( 0, 9.8f );
 

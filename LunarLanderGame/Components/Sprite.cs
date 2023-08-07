@@ -6,6 +6,7 @@
 
     public class Sprite : DrawableGameComponent
     {
+        // TODO: Define these in one place.
         private static float DEGREES_TO_RADIANS = (float)( Math.PI / 180.0 );
         private static float RADIANS_TO_DEGREES = (float)( 180.0 / Math.PI );
 

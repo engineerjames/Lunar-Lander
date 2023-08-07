@@ -1,6 +1,6 @@
 ﻿namespace LunarLanderGame.Logging
 {
-    internal interface ILogger
+    public interface ILogger
     {
         public enum LogLevel
         {
