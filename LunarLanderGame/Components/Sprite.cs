@@ -3,7 +3,6 @@
     using Microsoft.Xna.Framework.Graphics;
     using Microsoft.Xna.Framework;
     using System;
-    using System.Diagnostics;
 
     public class Sprite : DrawableGameComponent
     {
