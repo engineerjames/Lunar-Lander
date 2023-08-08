@@ -51,7 +51,9 @@
             // Add all your texture asset names here -- TODO: Load from input file?
             string [] textureAssetNames = new string []
             {
-                "lander"
+                "lander",
+                "flames",
+                "flames2"
             };
 
             foreach ( string assetName in textureAssetNames )

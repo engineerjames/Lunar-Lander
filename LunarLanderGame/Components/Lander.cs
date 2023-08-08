@@ -10,7 +10,7 @@
     public class Lander : DrawableGameComponent
     {
         private Sprite _lander;
-        // private Sprite _thruster;
+        private Sprite _thruster;
 
         // Physics related variables
         private Vector2 _landerVelocity;
@@ -24,9 +24,13 @@
 
         public Lander( Game game, TextureManager textureManager, Vector2 initialPosition, ILogger logger ) : base( game )
         {
-            _lander = new Sprite( game, "lander", textureManager, initialPosition );
+            // Setup lander
+            _lander = new Sprite( game, "lander", textureManager, initialPosition, Sprite.Origin.CENTER );
             _lander.SetScale( new Vector2( 0.1f, 0.1f ) );
-            _lander.SetPosition( initialPosition );
+
+            // Setup thruster
+            _thruster = new Sprite( game, "flames2", textureManager, initialPosition, Sprite.Origin.CENTER_LEFT );
+            _thruster.SetScale( new Vector2( 0.125f, 0.125f ) );
 
             // Physics related variables
             _landerVelocity = new Vector2( 0.0f, 15.0f );
@@ -40,6 +44,7 @@
         public override void Initialize( )
         {
             Game.Components.Add( _lander );
+            Game.Components.Add( _thruster );
 
             base.Initialize();
         }
@@ -92,9 +97,6 @@
 
         public override void Draw( GameTime gameTime )
         {
-            _lander.Draw( gameTime );
-            //_thruster.Draw( gameTime );
-
             base.Draw( gameTime );
         }
 
@@ -126,7 +128,21 @@
 
             ApplyPhysics( gameTime );
 
+            // Update thruster position based on lander
+            UpdateThrusterPosition();
+
+            _thruster.SetEnabled( _thrustMagnitude > 0.0f );
+
             base.Update( gameTime );
+        }
+
+        private void UpdateThrusterPosition( )
+        {
+            Vector2 thrusterPosition = _lander.GetPosition();
+
+            // First set the position and rotation of the thruster to the lander
+            _thruster.SetPosition( thrusterPosition );
+            _thruster.SetRotation( _lander.GetRotation() + 90.0f );            
         }
 
         private void ApplyPhysics( GameTime gameTime )

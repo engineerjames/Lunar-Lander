@@ -19,20 +19,39 @@
         private TextureManager textureManager;
         private string textureName;
 
-        internal Sprite( Game game, string textureName, TextureManager textureManager, Vector2 position )
+        bool isEnabled;
+
+        public enum Origin
+        {
+            CENTER,
+            CENTER_RIGHT,
+            CENTER_LEFT,
+            CENTER_TOP,
+            CENTER_BOTTOM
+        }
+
+        private Origin _origin;
+
+        public Sprite( Game game, string textureName, TextureManager textureManager, Vector2 initialPosition, Origin origin )
             : base( game )
         {
-            this.position = position;
+            this.position = initialPosition;
             color = Color.White;
             rotation = 0f;
             scale = Vector2.One;
 
             this.textureName = textureName;
             this.textureManager = textureManager;
+
+            _origin = origin;
+
+            isEnabled = true;
         }
 
         public override void Draw( GameTime gameTime )
         {
+            if ( !isEnabled ) { return; }
+
             SpriteBatch spriteBatch = Game.Services.GetService<SpriteBatch>();
 
             spriteBatch.Begin();
@@ -45,9 +64,35 @@
         protected override void LoadContent( )
         {
             texture = textureManager.GetTexture( textureName );
-            origin = new Vector2( texture.Width / 2, texture.Height / 2 );
+
+            switch ( _origin )
+            {
+                case Origin.CENTER:
+                    origin = new Vector2( texture.Width / 2, texture.Height / 2 );
+                    break;
+                case Origin.CENTER_RIGHT:
+                    origin = new Vector2( texture.Width, texture.Height / 2 );
+                    break;
+                case Origin.CENTER_LEFT:
+                    origin = new Vector2( 0.0f, texture.Height / 2 );
+                    break;
+                case Origin.CENTER_TOP:
+                    origin = new Vector2( texture.Width / 2, texture.Height );
+                    break;
+                case Origin.CENTER_BOTTOM:
+                    origin = new Vector2( texture.Width / 2, 0.0f );
+                    break;
+                default:
+                    // TODO: Add logging
+                    throw new Exception( "Invalid Origin setting." );
+            }
 
             base.LoadContent();
+        }
+
+        public Vector2 GetSize( )
+        {
+            return new Vector2( texture.Width, texture.Height );
         }
 
         // Helper methods to manipulate the sprite's properties
@@ -59,6 +104,12 @@
         public Vector2 GetPosition( )
         {
             return position;
+        }
+
+
+        public void SetEnabled( bool isEnabled )
+        {
+            this.isEnabled = isEnabled;
         }
 
         public void SetColor( Color newColor )
