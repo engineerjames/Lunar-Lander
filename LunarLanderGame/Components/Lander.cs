@@ -14,7 +14,6 @@
 
         // Physics related variables
         private Vector2 _landerVelocity;
-        private Vector2 _landerThrust;
         private Vector2 _landerAcceleration;
         private float _landerMassInKg;
         private float _thrustMagnitude;
@@ -22,7 +21,6 @@
         private ILogger _logger;
 
         private static float DEGREES_TO_RADIANS = (float)( Math.PI / 180.0 );
-        private static float RADIANS_TO_DEGREES = (float)( 180.0 / Math.PI );
 
         public Lander( Game game, TextureManager textureManager, Vector2 initialPosition, ILogger logger ) : base( game )
         {
@@ -32,7 +30,7 @@
 
             // Physics related variables
             _landerVelocity = new Vector2( 0.0f, 15.0f );
-            _landerThrust = Vector2.Zero;
+            _thrustMagnitude = 0.0f;
             _landerAcceleration = Vector2.Zero;
             _landerMassInKg = 100.0f;
 
@@ -56,12 +54,17 @@
             _lander.SetRotation( angleInDegrees );
         }
 
-        public void SetThrustMagnitudeInNewtons(float thrustInNewtons )
+        public void SetThrustMagnitudeInNewtons( float thrustInNewtons )
         {
-            _thrustMagnitude = thrustInNewtons;
+            if ( thrustInNewtons < 0.0f )
+            {
+                _logger.Log( ILogger.LogLevel.Error, "Cannot set a negative thrust magnitude." );
+            }
+
+            _thrustMagnitude = Math.Abs( thrustInNewtons );
         }
 
-        public float GetThrustMagnitudeInNewtons()
+        public float GetThrustMagnitudeInNewtons( )
         {
             return _thrustMagnitude;
         }
@@ -75,13 +78,16 @@
         {
             // The rotation we obtain here is of the LANDER - 0° means the thrust vector is pointing straight up.
             // However, rotations in a vector sense are then 90° out of phase (0° points right across the X-axis).
-            float theta = (90 - GetRotation()) * DEGREES_TO_RADIANS;
+            //
+            // Also, Math.Cos and Math.Sin expect the angle to be provided in radians.
+            float theta = ( 90 - GetRotation() ) * DEGREES_TO_RADIANS;
             float Vx = (float)( _thrustMagnitude * Math.Cos( theta ) );
             float Vy = (float)( _thrustMagnitude * Math.Sin( theta ) );
 
             // Since our coordinate system has Y facing down, we always invert the "Y" coordinate.
+            _logger.Log( ILogger.LogLevel.Info, $"Vx: {Vx}, Vy: {-Vy}" );
 
-            return new Vector2(Vx, -Vy);
+            return new Vector2( Vx, -Vy );
         }
 
         public override void Draw( GameTime gameTime )
@@ -97,11 +103,11 @@
             if ( Keyboard.GetState().IsKeyDown( Keys.W ) )
             {
                 // TODO: Add thrust based on rotation
-                _landerThrust = new Vector2( 0.0f, -2000.0f );
+                _thrustMagnitude = 2000.0f;
             }
             else
             {
-                _landerThrust = Vector2.Zero;
+                _thrustMagnitude = 0.0f;
             }
 
             if ( Keyboard.GetState().IsKeyDown( Keys.A ) )
@@ -127,9 +133,11 @@
         {
             Vector2 gravity = new Vector2( 0, 9.8f );
 
-            Vector2 accelerationFromThrust = _landerThrust / _landerMassInKg;
+            Vector2 vectorizedThrust = CalculateVectorizedThrust();
 
-            if ( accelerationFromThrust.Length() < gravity.Length() && _landerThrust.Length() > 0 )
+            Vector2 accelerationFromThrust = vectorizedThrust / _landerMassInKg;
+
+            if ( accelerationFromThrust.Length() < gravity.Length() && vectorizedThrust.Length() > 0 )
             {
                 _logger.Log( ILogger.LogLevel.Info, "Can't fight gravity!" );
             }
