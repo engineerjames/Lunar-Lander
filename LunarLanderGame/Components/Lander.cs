@@ -103,7 +103,7 @@
             if ( Keyboard.GetState().IsKeyDown( Keys.W ) )
             {
                 // TODO: Add thrust based on rotation
-                _thrustMagnitude = 2000.0f;
+                _thrustMagnitude = 2500.0f;
             }
             else
             {
