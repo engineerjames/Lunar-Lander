@@ -9,18 +9,22 @@
 
     public class Lander : DrawableGameComponent
     {
-        private Sprite _lander;
-        private Sprite _thruster;
+        private readonly Sprite _lander;
+        private readonly Sprite _thruster;
 
         // Physics related variables
         private Vector2 _landerVelocity;
         private Vector2 _landerAcceleration;
-        private float _landerMassInKg;
+        private readonly float _landerMassInKg;
         private float _thrustMagnitude;
+        
+        // Fuel tracking
+        private float _landerFuelMassInKg;
+        private float _landerBurnRateKgPerSecond;
 
-        private ILogger _logger;
+        private readonly ILogger _logger;
 
-        private static float DEGREES_TO_RADIANS = (float)( Math.PI / 180.0 );
+        private static readonly float DEGREES_TO_RADIANS = (float)( Math.PI / 180.0 );
 
         public Lander( Game game, TextureManager textureManager, Vector2 initialPosition, ILogger logger ) : base( game )
         {
@@ -33,10 +37,12 @@
             _thruster.SetScale( new Vector2( 0.125f, 0.125f ) );
 
             // Physics related variables
-            _landerVelocity = new Vector2( 0.0f, 15.0f );
+            _landerVelocity = new Vector2( 150.0f, 5.0f );
             _thrustMagnitude = 0.0f;
             _landerAcceleration = Vector2.Zero;
-            _landerMassInKg = 100.0f;
+            _landerMassInKg = 200.0f;
+            _landerFuelMassInKg = 100.0f;
+            _landerBurnRateKgPerSecond = 2.5f;
 
             _logger = logger;
         }
@@ -102,10 +108,10 @@
 
         public override void Update( GameTime gameTime )
         {
-            if ( Keyboard.GetState().IsKeyDown( Keys.W ) )
+            if ( Keyboard.GetState().IsKeyDown( Keys.W ) && _landerFuelMassInKg > 0.0f )
             {
                 // TODO: Add thrust based on rotation
-                _thrustMagnitude = 2500.0f;
+                _thrustMagnitude = 5000.0f;
             }
             else
             {
@@ -139,23 +145,45 @@
         private void UpdateThrusterPosition( )
         {
             Vector2 thrusterPosition = _lander.GetPosition();
+            float thrustRotation = _lander.GetRotation() + 90.0f;
 
             // First set the position and rotation of the thruster to the lander
             _thruster.SetPosition( thrusterPosition );
-            _thruster.SetRotation( _lander.GetRotation() + 90.0f );            
+            _thruster.SetRotation( thrustRotation );
+
+            // Then offset in the y by magnitude of 20
+            float positionOffsetMagnitude = 20.0f;
+            Vector2 newThrustPosition = new Vector2( (float)( positionOffsetMagnitude * Math.Cos( thrustRotation * DEGREES_TO_RADIANS ) ), 
+                                                     (float)( positionOffsetMagnitude * Math.Sin( thrustRotation * DEGREES_TO_RADIANS ) ));
+
+            _thruster.SetPosition( newThrustPosition + _thruster.GetPosition() );
+        }
+
+        public float GetTotalMass()
+        {
+            return ( _landerMassInKg + _landerFuelMassInKg );
         }
 
         private void ApplyPhysics( GameTime gameTime )
         {
-            Vector2 gravity = new Vector2( 0, 9.8f );
+            var gravity = new Vector2( 0, 9.8f );
 
             Vector2 vectorizedThrust = CalculateVectorizedThrust();
 
-            Vector2 accelerationFromThrust = vectorizedThrust / _landerMassInKg;
+            Vector2 accelerationFromThrust = vectorizedThrust / GetTotalMass();
 
             if ( accelerationFromThrust.Length() < gravity.Length() && vectorizedThrust.Length() > 0 )
             {
                 _logger.Log( ILogger.LogLevel.Info, "Can't fight gravity!" );
+            }
+
+            if ( accelerationFromThrust.Length() > 0.0f )
+            {
+                _landerFuelMassInKg -= _landerBurnRateKgPerSecond * (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+                _landerFuelMassInKg = Math.Max( 0.0f, _landerFuelMassInKg );
+
+                _logger.Log( ILogger.LogLevel.Info, $"Lander fuel: {_landerFuelMassInKg}" );
             }
 
             // Currently, just gravity--but we will need to figure out the thruster
