@@ -18,6 +18,8 @@
 
         private Lander _lander;
 
+        private CameraComponent _camera;
+
         // Planet
         private PlanetGenerator _planetGenerator;
         private Planet _planet;
@@ -42,10 +44,15 @@
             _planet = _planetGenerator.GetDefaultPlanet( this, _graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight );
 
             _lander = new Lander( this, _textureManager, new Vector2( _graphics.PreferredBackBufferWidth / 2, _graphics.PreferredBackBufferHeight / 2 ), _logger );
+
         }
 
         protected override void LoadContent( )
         {
+            _camera = new CameraComponent( this, _lander, _graphics.GraphicsDevice );
+            Components.Add( _camera );
+
+            _camera.AddDrawable( _lander );
         }
 
         protected override void Initialize( )
@@ -66,21 +73,16 @@
 
         protected override void Update( GameTime gameTime )
         {
-            // We only control the _lander here
-            ProcessPlayerInput( gameTime );
-
-            base.Update( gameTime );
-        }
-
-        private void ProcessPlayerInput( GameTime gameTime )
-        {
             if ( GamePad.GetState( PlayerIndex.One ).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown( Keys.Escape ) )
                 Exit();
+
+            base.Update( gameTime );
         }
 
         protected override void Draw( GameTime gameTime )
         {
             GraphicsDevice.Clear( Color.Black );
+
 
             base.Draw( gameTime );
         }
