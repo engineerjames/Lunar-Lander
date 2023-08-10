@@ -53,8 +53,9 @@
             if ( !isEnabled ) { return; }
 
             SpriteBatch spriteBatch = Game.Services.GetService<SpriteBatch>();
+            CameraComponent cameraComponent = Game.Services.GetService<CameraComponent>();
 
-            spriteBatch.Begin();
+            spriteBatch.Begin( transformMatrix: cameraComponent.GetTransformationMatrix() );
             spriteBatch.Draw( texture, position, null, color, rotation, origin, scale, SpriteEffects.None, 0f );
             spriteBatch.End();
 

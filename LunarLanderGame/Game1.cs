@@ -24,6 +24,8 @@
         private PlanetGenerator _planetGenerator;
         private Planet _planet;
 
+        bool hasBeenInitialized = false;
+
         public Game1( )
         {
             _graphics = new GraphicsDeviceManager( this );
@@ -49,10 +51,10 @@
 
         protected override void LoadContent( )
         {
-            _camera = new CameraComponent( this, _lander, _graphics.GraphicsDevice );
+            _camera = new CameraComponent( this, _lander );
             Components.Add( _camera );
 
-            _camera.AddDrawable( _lander );
+            Services.AddService( _camera );
         }
 
         protected override void Initialize( )
@@ -69,12 +71,19 @@
             Services.AddService( _textureManager );
 
             base.Initialize();
+
+            hasBeenInitialized = true;
         }        
 
         protected override void Update( GameTime gameTime )
         {
             if ( GamePad.GetState( PlayerIndex.One ).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown( Keys.Escape ) )
                 Exit();
+
+            if (hasBeenInitialized)
+            {
+                _camera.SetViewPort( GraphicsDevice.Viewport );
+            }
 
             base.Update( gameTime );
         }
