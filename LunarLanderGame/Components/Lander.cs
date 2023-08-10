@@ -198,7 +198,7 @@
             _lander.SetPosition( _lander.GetPosition() + _landerVelocity * (float)( gameTime.ElapsedGameTime.TotalSeconds ) );
         }
 
-        Vector2 GetPosition( )
+        public Vector2 GetPosition( )
         {
             return _lander.GetPosition();
         }
