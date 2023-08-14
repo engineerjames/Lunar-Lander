@@ -19,7 +19,7 @@
         private TextureManager textureManager;
         private string textureName;
 
-        bool isEnabled;
+        private bool isEnabled;
 
         public enum Origin
         {

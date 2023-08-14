@@ -17,7 +17,7 @@
         private Vector2 _landerAcceleration;
         private readonly float _landerMassInKg;
         private float _thrustMagnitude;
-        
+
         // Fuel tracking
         private float _landerFuelMassInKg;
         private float _landerBurnRateKgPerSecond;
@@ -25,6 +25,9 @@
         private readonly ILogger _logger;
 
         private static readonly float DEGREES_TO_RADIANS = (float)( Math.PI / 180.0 );
+
+        private bool _exploded;
+        private bool _landed;
 
         public Lander( Game game, TextureManager textureManager, Vector2 initialPosition, ILogger logger ) : base( game )
         {
@@ -37,7 +40,7 @@
             _thruster.SetScale( new Vector2( 0.125f, 0.125f ) );
 
             // Physics related variables
-            _landerVelocity = new Vector2( 150.0f, 5.0f );
+            _landerVelocity = new Vector2( 100.0f, 10.0f );
             _thrustMagnitude = 0.0f;
             _landerAcceleration = Vector2.Zero;
             _landerMassInKg = 200.0f;
@@ -106,8 +109,15 @@
             base.Draw( gameTime );
         }
 
+        public float GetSpeed( )
+        {
+            return _landerVelocity.Length();
+        }
+
         public override void Update( GameTime gameTime )
         {
+            if ( _exploded || _landed ) return;
+
             if ( Keyboard.GetState().IsKeyDown( Keys.W ) && _landerFuelMassInKg > 0.0f )
             {
                 // TODO: Add thrust based on rotation
@@ -153,13 +163,13 @@
 
             // Then offset in the y by magnitude of 20
             float positionOffsetMagnitude = 20.0f;
-            Vector2 newThrustPosition = new Vector2( (float)( positionOffsetMagnitude * Math.Cos( thrustRotation * DEGREES_TO_RADIANS ) ), 
-                                                     (float)( positionOffsetMagnitude * Math.Sin( thrustRotation * DEGREES_TO_RADIANS ) ));
+            Vector2 newThrustPosition = new Vector2( (float)( positionOffsetMagnitude * Math.Cos( thrustRotation * DEGREES_TO_RADIANS ) ),
+                                                     (float)( positionOffsetMagnitude * Math.Sin( thrustRotation * DEGREES_TO_RADIANS ) ) );
 
             _thruster.SetPosition( newThrustPosition + _thruster.GetPosition() );
         }
 
-        public float GetTotalMass()
+        public float GetTotalMass( )
         {
             return ( _landerMassInKg + _landerFuelMassInKg );
         }
@@ -201,6 +211,35 @@
         public Vector2 GetPosition( )
         {
             return _lander.GetPosition();
+        }
+
+        public void Explode( )
+        {
+            _exploded = true;
+            _landerAcceleration = Vector2.Zero;
+            _landerVelocity = Vector2.Zero;
+            _thrustMagnitude = 0.0f;
+            _thruster.SetEnabled( false );
+            _lander.SetEnabled( false );
+        }
+
+        public void Land( )
+        {
+            _landed = true;
+            _landerAcceleration = Vector2.Zero;
+            _landerVelocity = Vector2.Zero;
+            _thrustMagnitude = 0.0f;
+            _thruster.SetEnabled( false );
+        }
+
+        public bool HasLanded()
+        {
+            return _landed;
+        }
+
+        public bool HasExploded()
+        {
+            return _exploded;
         }
     }
 }

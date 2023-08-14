@@ -43,10 +43,10 @@
             _graphics.PreferredBackBufferHeight = 1080;
 
             _planetGenerator = new PlanetGenerator();
-            _planet = _planetGenerator.GetDefaultPlanet( this, _graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight );
 
             _lander = new Lander( this, _textureManager, new Vector2( _graphics.PreferredBackBufferWidth / 2, _graphics.PreferredBackBufferHeight / 2 ), _logger );
 
+            _planet = _planetGenerator.GetDefaultPlanet( this, _lander, _graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight );
         }
 
         protected override void LoadContent( )

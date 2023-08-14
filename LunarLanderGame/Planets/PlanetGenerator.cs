@@ -11,9 +11,9 @@
         //
         // *                 *
         // *                 *
-        public Planet GetDefaultPlanet( Game game, int width, int height )
+        public Planet GetDefaultPlanet( Game game, Lander lander, int width, int height )
         {
-            var planet = new Planet( game );
+            var planet = new Planet( game, lander );
 
             Color vertexColor = Color.Gray;
 
